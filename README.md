@@ -1,9 +1,19 @@
 # Terraform
+## Cloud Networks
+![alt text](https://cdn.discordapp.com/attachments/836898832637624370/841615996284043274/public-private-hybrid-clouds.png)
+
 ## What is Terraform?
+Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions. Configuration files describe to Terraform the components needed to run a single application or your entire datacenter.
 
 ## What are the benefits of Terraform?
+- Simple to install
+- Improved multi-cloud infrastructure deployment
+- Simple to use
+- Reduced development costs
+- Reduced time to provision
 
 ## Using Terraform
+![alt text](https://miro.medium.com/max/1052/1*ONt5L9S_sNaLQoIoECflWQ.png)
 
 ### Installing Terraform
 - Download desired Terraform version as a zipped file
@@ -13,9 +23,12 @@
 - `terraform --version` to test installed correctly
 
 ### Terrafrom most used commands
+- `terraform init`
+- `terraform plan`
+- `terraform apply`
+- `terraform destroy`
 
 ### Using Terraform with AWS
-
 #### Securing AWS keys with Terraform
 - Open advanced system settings and environment variables
 - Add new variables
