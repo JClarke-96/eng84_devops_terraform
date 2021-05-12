@@ -30,16 +30,24 @@ resource "aws_internet_gateway" "terraform_igw" {
   }
 }
 
-# create route table
-resource "aws_route_table" "terraform_rt" {
-  vpc_id = aws_vpc.terraform_vpc.id
-  route {
-  	cidr_block = "0.0.0.0/0"
-  	gateway_id = aws_internet_gateway.terraform_igw.id
-  }
-  tags = {
-  	Name = "eng84_jordan_terraform_rt"
-  }
+# create public route table
+resource "aws_route_table" "terraform_public_rt" {
+	vpc_id = aws_vpc.terraform_vpc.id
+	route {
+		cidr_block = "0.0.0.0/0"
+		gateway_id = aws_internet_gateway.terraform_igw.id
+ 	}
+	tags = {
+		Name = "eng84_jordan_terraform_pub_rt"
+	}
+}
+
+# create private route table
+resource "aws_route_table" "terraform_priv_rt" {
+	vpc_id = aws_vpc.terraform_vpc.id
+	tags = {
+		Name = "eng84_jordan_terraform_priv_rt"
+	}
 }
 
 # block of code to create a subnet
@@ -52,13 +60,28 @@ resource "aws_subnet" "terraform_app_subnet" {
 	}
 }
 
-# associate route tables with subnets
+# block of code to create a subnet
+resource "aws_subnet" "terraform_db_subnet" {
+	vpc_id = aws_vpc.terraform_vpc.id
+	cidr_block = "32.34.14.0/24"
+	availability_zone = "eu-west-1b"
+	tags = {
+		Name = "eng84_jordan_terraform_db"
+	}
+}
+# associate route tables with app subnet
 resource "aws_route_table_association" "app" {
   subnet_id = aws_subnet.terraform_app_subnet.id
-  route_table_id = aws_route_table.terraform_rt.id
+  route_table_id = aws_route_table.terraform_public_rt.id
 }
 
-# block of code to create a security group
+# associate route tables with db subnet
+resource "aws_route_table_association" "db" {
+  subnet_id = aws_subnet.terraform_db_subnet.id
+  route_table_id = aws_route_table.terraform_priv_rt.id
+}
+
+# block of code to create an app security group
 resource "aws_security_group" "terraform_public_sg" {
 	name = "eng84_jordan_terraform_sg"
 	description = "app security group"
@@ -75,8 +98,28 @@ resource "aws_security_group" "terraform_public_sg" {
 		from_port =		"22"
 		to_port =		"22"
 		protocol =		"tcp"
-		cidr_blocks =	self.public_ip #"46.64.78.97/32"	
-		# insert IP here
+		cidr_blocks =	["87.80.63.166/32"]	# insert IP here
+	}
+
+	egress {
+		from_port =		0
+		to_port = 		0
+		protocol = 		"-1"
+		cidr_blocks =	["0.0.0.0/0"]
+	}
+}
+
+# block of code to create a db security group
+resource "aws_security_group" "terraform_priv_sg" {
+	name = "eng84_jordan_terraform_priv_sg"
+	description = "db security group"
+	vpc_id = aws_vpc.terraform_vpc.id
+
+	ingress {
+		from_port =		"22"
+		to_port =		"22"
+		protocol =		"tcp"
+		cidr_blocks =	["32.34.12.0/24"]
 	}
 
 	egress {
@@ -88,25 +131,43 @@ resource "aws_security_group" "terraform_public_sg" {
 }
 
 # Launching an EC2 instance from AMI
+#resource "aws_instance" "db_instance"{
+#	ami = var.db_ami_id
+#	subnet_id = aws_subnet.terraform_db_subnet.id
+#	vpc_security_group_ids = ["${aws_security_group.terraform_priv_sg.id}"]
+#	instance_type = "t2.micro"
+#	associate_public_ip_address = false
+#	key_name = var.aws_key_name
+#	tags = {
+#		Name = "eng84_jordan_terraform_db"
+#	}
+#}
+
+# Launching an EC2 instance from AMI
 resource "aws_instance" "app_instance"{
 	ami = var.webapp_ami_id
 	subnet_id = aws_subnet.terraform_app_subnet.id
 	vpc_security_group_ids = ["${aws_security_group.terraform_public_sg.id}"]
 	instance_type = "t2.micro"
 	associate_public_ip_address = true
-	tags = {
-		Name = var.name
-	}
 	key_name = var.aws_key_name
+	tags = {
+		Name = "eng84_jordan_terraform_app"
+	}
+	
+	provisioner "file" {
+		source =	"./app/init.sh"
+		destination =	"/tmp/init.sh"
+	}
+
+	provisioner "remote-exec" {
+    	inline = ["./app/init.sh"]
+  	}
+
+  	connection {
+    	type        = "ssh"
+    	user        = "ubuntu"
+    	private_key = file(var.aws_key_path)
+    	host        = self.public_ip
+  	}
 }
-
-  provisioner "remote-exec" {
-    inline = ".app/init.sh.tpl"
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file(var.key_path)
-    host        = self.public_ip
-  }
