@@ -24,9 +24,9 @@ Terraform is a tool for building, changing, and versioning infrastructure safely
 
 ### Terrafrom most used commands
 - `terraform init`
-- `terraform plan`
-- `terraform apply`
-- `terraform destroy`
+- `terraform plan` checks syntax
+- `terraform apply` runs main.tf
+- `terraform destroy` destroys resources from main.tf
 
 ### Using Terraform with AWS
 #### Securing AWS keys with Terraform
@@ -35,6 +35,17 @@ Terraform is a tool for building, changing, and versioning infrastructure safely
 	- `AWS_ACCESS_KEY_ID`
 	- `AWS_SECRET_ACCESS_KEY`
 
+#### Using main.tf
+- Create VPC
+- Create Internet Gateway
+- Create Route Table
+- Create subnet for app instance
+- Create subnet for db instance
+- Associate route tables with created subnets
+- Create app security group
+- Create database security group
+- Create db instance
+- Create app instance
 ```
 provider "aws"{
 	region = "eu-west-1"
@@ -44,8 +55,13 @@ resource "aws_instance" "app_instance"{
 	ami = "ami-08412dcc11680fa41"
 	instance_type = "t2.micro"
 	associate_public_ip_address = true
+
 	tags = {
 		Name = "eng84_jordan_terraform_app"
 	}
 }
 ```
+- Run app from app instance
+	- `DB_HOST=mongodb://32.34.14.X:27017/posts` change DB_HOST env variable to correct private IP for db instance
+	- SSH into app instance
+	- nodejs app.js
