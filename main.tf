@@ -128,6 +128,7 @@ resource "aws_instance" "db_instance"{
 	vpc_security_group_ids = ["${aws_security_group.terraform_priv_sg.id}"]
 	instance_type = "t2.micro"
 	associate_public_ip_address = false
+	private_ip = "32.34.2.42"
 	key_name = var.aws_key_name
 	tags = {
 		Name = var.aws_db
@@ -142,23 +143,27 @@ resource "aws_instance" "app_instance"{
 	instance_type = "t2.micro"
 	associate_public_ip_address = true
 	key_name = var.aws_key_name
+
 	tags = {
 		Name = var.aws_app
 	}
+
+	provisioner "file" {
+		source =		"./app/init.sh"
+		destination =	"/tmp/init.sh"
+	}
 	
-	#provisioner "file" {
-	#	source =	"./app/init.sh"
-	#	destination =	"/tmp/init.sh"
-	#}
+	provisioner "remote-exec" {
+    	inline = [
+    		"chmod +x /tmp/init.sh",
+    		"bash /tmp/init.sh",
+    	]
+    }
 
-	#provisioner "remote-exec" {
-    #	inline = ["./app/init.sh"]
-  	#}
-
-  	#connection {
-    #	type        = "ssh"
-    #	user        = "ubuntu"
-    #	private_key = file(var.aws_key_path)
-    #	host        = self.public_ip
-  	#}
+  	connection {
+    	type        = "ssh"
+    	user        = "ubuntu"
+    	private_key = file(var.aws_key_path)
+    	host        = self.public_ip
+  	}
 }
