@@ -18,7 +18,7 @@ resource "aws_vpc" "terraform_vpc" {
 	cidr_block =		"32.34.0.0/16"
 	instance_tenancy =	"default"
 	tags = {
-		Name = "eng84_jordan_terraform_vpc"
+		Name = var.aws_vpc
 	}
 }
 
@@ -26,7 +26,7 @@ resource "aws_vpc" "terraform_vpc" {
 resource "aws_internet_gateway" "terraform_igw" {
   vpc_id = aws_vpc.terraform_vpc.id
   tags = {
-    Name = "eng84_jordan_terraform_igw"
+    Name = var.aws_ig
   }
 }
 
@@ -38,29 +38,30 @@ resource "aws_route_table" "terraform_rt" {
 		gateway_id = aws_internet_gateway.terraform_igw.id
  	}
 	tags = {
-		Name = "eng84_jordan_terraform_rt"
+		Name = var.aws_rt
 	}
 }
 
 # block of code to create app subnet
 resource "aws_subnet" "terraform_app_subnet" {
 	vpc_id = aws_vpc.terraform_vpc.id
-	cidr_block = "32.34.12.0/24"
-	availability_zone = "eu-west-1b"
+	cidr_block = var.app_cidr
+	availability_zone = var.a_zone
 	tags = {
-		Name = "eng84_jordan_terraform_app"
+		Name = var.aws_app
 	}
 }
 
 # block of code to create db subnet
 resource "aws_subnet" "terraform_db_subnet" {
 	vpc_id = aws_vpc.terraform_vpc.id
-	cidr_block = "32.34.14.0/24"
-	availability_zone = "eu-west-1b"
+	cidr_block = var.db_cidr
+	availability_zone = var.a_zone
 	tags = {
-		Name = "eng84_jordan_terraform_db"
+		Name = var.aws_db
 	}
 }
+
 # associate route tables with app subnet
 resource "aws_route_table_association" "app" {
   subnet_id = aws_subnet.terraform_app_subnet.id
@@ -75,8 +76,7 @@ resource "aws_route_table_association" "db" {
 
 # block of code to create an app security group
 resource "aws_security_group" "terraform_public_sg" {
-	name = "eng84_jordan_terraform_sg"
-	description = "app security group"
+	name = var.app_sg
 	vpc_id = aws_vpc.terraform_vpc.id
 
 	ingress {
@@ -90,7 +90,7 @@ resource "aws_security_group" "terraform_public_sg" {
 		from_port =		"22"
 		to_port =		"22"
 		protocol =		"tcp"
-		cidr_blocks =	["87.80.63.166/32"]	# insert IP here
+		cidr_blocks =	[var.my_ip]
 	}
 
 	egress {
@@ -103,15 +103,14 @@ resource "aws_security_group" "terraform_public_sg" {
 
 # block of code to create a db security group
 resource "aws_security_group" "terraform_priv_sg" {
-	name = "eng84_jordan_terraform_priv_sg"
-	description = "db security group"
+	name = var.db_sg
 	vpc_id = aws_vpc.terraform_vpc.id
 
 	ingress {
 		from_port = 	"0"
 		to_port = 		"0"
 		protocol =		"-1"
-		cidr_blocks = 	["0.0.0.0/0"]
+		cidr_blocks = 	[var.app_cidr]
 	}
 
 	egress {
@@ -131,7 +130,7 @@ resource "aws_instance" "db_instance"{
 	associate_public_ip_address = false
 	key_name = var.aws_key_name
 	tags = {
-		Name = "eng84_jordan_terraform_db"
+		Name = var.aws_db
 	}
 }
 
@@ -144,7 +143,7 @@ resource "aws_instance" "app_instance"{
 	associate_public_ip_address = true
 	key_name = var.aws_key_name
 	tags = {
-		Name = "eng84_jordan_terraform_app"
+		Name = var.aws_app
 	}
 	
 	#provisioner "file" {
