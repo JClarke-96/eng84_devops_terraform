@@ -98,6 +98,7 @@ sudo systemctl start webapp
 A load balancer serves as the single point of contact for users. The load balancer distributes incoming application traffic across multiple targets, such as EC2 instances, in multiple Availability Zones. This increases the availability of the application.
 
 It monitors the health of its registered targets, and routes traffic only to healthy targets. Elastic Load Balancing also scales the load balancer as incoming traffic changes over time.
+
 ![alt text](https://miro.medium.com/max/1200/0*UCFdX5MLOV2Pt3bL)
 
 ### How does an Application Load Balancer work?
@@ -113,23 +114,20 @@ Each target group routes requests to one or more registered targets, such as EC2
 - Support for monitoring the health of each service at the target group level
 - If the application fails in a target group, the load balancer will redirect traffic to a healthy group
 
-### Using Application Load Balancers
-#### Using AWS Console
+### Using Application Load Balancers with Terraform
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb
 
-#### Using IAC with Terraform
+## Auto-Scaling Groups
+### What is an Auto-Scaling Group?
+Auto-Scaling monitors applications and automatically adjusts capacity to maintain steady, predictable performance at the lowest possible cost. At moments of higher traffic, the autoscaling group will scale to support the additional users, and at lower traffic reduce to fit the needs.
 
-## Autoscaling Groups
-### What is an Autoscaling Group?
-Auto Scaling monitors applications and automatically adjusts capacity to maintain steady, predictable performance at the lowest possible cost. At moments of higher traffic, the autoscaling group will scale to support the additional users, and at lower traffic reduce to fit the needs.
 ![alt text](https://docs.aws.amazon.com/autoscaling/ec2/userguide/images/as-sample-web-architecture-diagram-with-asgs.png)
 
-### What are the benefits of an Autoscaling Group?
+### What are the benefits of an Auto-Scaling Group?
 - Scale out to support higher traffic to ensure steady performance for users
 - Scale in for lower traffic to reduce cost on servers not being used
 - Maintain optimal performance and availability
 - Remove excess resource capacity to reduce cost
 
-### Using Autoscaling Groups
-#### Using AWS Console
-
-#### Using IAC with Terraform
+### Using Auto-Scaling Groups with Terraform
+https://registry.terraform.io/modules/terraform-aws-modules/autoscaling/aws/latest
