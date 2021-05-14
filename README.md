@@ -93,26 +93,43 @@ WantedBy=multi-user.target
 sudo systemctl start webapp
 ```
 
-## Autoscaling Groups
-### What is an Autoscaling Group?
-An Auto Scaling group contains a collection of Amazon EC2 instances that are treated as a logical grouping for the purposes of automatic scaling and management. An Auto Scaling group also enables you to use Amazon EC2 Auto Scaling features such as health check replacements and scaling policies.
-![alt text](https://docs.aws.amazon.com/autoscaling/ec2/userguide/images/as-sample-web-architecture-diagram-with-asgs.png)
+## Application Load Balancer
+### What is an Application Load Balancer?
+A load balancer serves as the single point of contact for users. The load balancer distributes incoming application traffic across multiple targets, such as EC2 instances, in multiple Availability Zones. This increases the availability of the application.
 
-### What are the benefits of an Autoscaling Group?
+It monitors the health of its registered targets, and routes traffic only to healthy targets. Elastic Load Balancing also scales the load balancer as incoming traffic changes over time.
+![alt text](https://miro.medium.com/max/1200/0*UCFdX5MLOV2Pt3bL)
 
-### Using Autoscaling Groups
+### How does an Application Load Balancer work?
+When creating a load balancer, you add one or more listeners. A listener checks for connection requests from clients, using the protocol and port configuration. The rules that are defined for a listener determine how the load balancer routes requests to its registered targets. Each rule consists of a priority, one or more actions, and one or more conditions. When the conditions for the rule are met, then its actions are performed.
+
+Each target group routes requests to one or more registered targets, such as EC2 instances, using the protocol and port number specified. A target can be registered with multiple target groups. Health checks can also be set up on target groups which are performed on all targets registered to the target group and is specified in a listener rule for the load balancer.
+
+![alt text](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/images/component_architecture.png)
+
+### What are the benefits of an Application Load Balancer?
+- Highly available as the application can be run in multiple locations and redirected from listener
+- Can structure the application as smaller services, routing requests to the correct service based on URL
+- Support for monitoring the health of each service at the target group level
+- If the application fails in a target group, the load balancer will redirect traffic to a healthy group
+
+### Using Application Load Balancers
 #### Using AWS Console
 
 #### Using IAC with Terraform
 
-## Application Load Balancer
-### What is an Application Load Balancer?
+## Autoscaling Groups
+### What is an Autoscaling Group?
+Auto Scaling monitors applications and automatically adjusts capacity to maintain steady, predictable performance at the lowest possible cost. At moments of higher traffic, the autoscaling group will scale to support the additional users, and at lower traffic reduce to fit the needs.
+![alt text](https://docs.aws.amazon.com/autoscaling/ec2/userguide/images/as-sample-web-architecture-diagram-with-asgs.png)
 
-![alt text](https://miro.medium.com/max/1200/0*UCFdX5MLOV2Pt3bL)
+### What are the benefits of an Autoscaling Group?
+- Scale out to support higher traffic to ensure steady performance for users
+- Scale in for lower traffic to reduce cost on servers not being used
+- Maintain optimal performance and availability
+- Remove excess resource capacity to reduce cost
 
-### What are the benefits of an Application Load Balancer?
-
-### Using Application Load Balancers
+### Using Autoscaling Groups
 #### Using AWS Console
 
 #### Using IAC with Terraform
