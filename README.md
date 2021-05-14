@@ -92,3 +92,27 @@ WantedBy=multi-user.target
 
 sudo systemctl start webapp
 ```
+
+## Autoscaling Groups
+### What is an Autoscaling Group?
+An Auto Scaling group contains a collection of Amazon EC2 instances that are treated as a logical grouping for the purposes of automatic scaling and management. An Auto Scaling group also enables you to use Amazon EC2 Auto Scaling features such as health check replacements and scaling policies.
+![alt text](https://docs.aws.amazon.com/autoscaling/ec2/userguide/images/as-sample-web-architecture-diagram-with-asgs.png)
+
+### What are the benefits of an Autoscaling Group?
+
+### Using Autoscaling Groups
+#### Using AWS Console
+
+#### Using IAC with Terraform
+
+## Application Load Balancer
+### What is an Application Load Balancer?
+
+![alt text](https://miro.medium.com/max/1200/0*UCFdX5MLOV2Pt3bL)
+
+### What are the benefits of an Application Load Balancer?
+
+### Using Application Load Balancers
+#### Using AWS Console
+
+#### Using IAC with Terraform
